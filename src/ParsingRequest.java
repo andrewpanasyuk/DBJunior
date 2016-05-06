@@ -34,6 +34,8 @@ public class ParsingRequest {
                 break;
             case 4: renameTable(request);
                 break;
+            case 5: selectAllData(request);
+                break;
             default:
                 System.out.println("Sorry, You command is bad!");
                 break;
@@ -63,15 +65,19 @@ public class ParsingRequest {
     }
 
     private void deleteAllFrom (String request){
-        String nameTab = getName(request);
+        writer.deleteAll(request);
 
     }
 
     private void renameTable(String request){
         String oldName = getName(request);
         String newName = request.substring(request.lastIndexOf(("%"), request.lastIndexOf("%")-1)+1, request.lastIndexOf("%"));
-        System.out.println(oldName);
-        System.out.println(newName);
-
+        writer.renameTable(oldName, newName);
+    }
+    private void selectAllData(String request){
+        ArrayList <String> getData = writer.printData();
+        for (int i = 0; i < getData.size(); i++){
+            System.out.println(getData.get(i).substring(0, getData.get(i).indexOf("#")) + "   " + getData.get(i).substring(getData.get(i).indexOf("#")+1));
+        }
     }
 }

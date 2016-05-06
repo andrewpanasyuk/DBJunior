@@ -1,5 +1,6 @@
 import java.io.*;
-import java.util.Iterator;
+import java.util.ArrayList;
+
 
 /**
  * Created by a_pan on 05.05.2016.
@@ -7,32 +8,27 @@ import java.util.Iterator;
 public class Writer {
 
     private File list;
-    private File dataBaseName;
-    private int count = 0;
+
+
     private String nameDataBase;
     RandomAccessFile raf = null;
 
 
-    public void creatTabl(String nameTable){
+    public void creatTabl(String nameTable) {
         try {
-           list = new File(nameDataBase + System.getProperty("file.separator") + nameTable + ".txt");
-
+            list = new File(nameDataBase + System.getProperty("file.separator") + nameTable + ".txt");
             if (list.exists()) {
                 list.delete();
                 list.createNewFile();
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-
-
     }
 
     public void creatDBfile(String nameDB) {
         nameDataBase = nameDB;
         try {
-
             new File(nameDB).mkdirs();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -42,7 +38,6 @@ public class Writer {
 
 
     public void add(Object object) {
-        //list = new File("text.txt");
         try {
             raf = new RandomAccessFile(list, "rw");
             String s;
@@ -58,44 +53,27 @@ public class Writer {
             } catch (IOException i) {
             }
         }
-
-
     }
 
 
-    public boolean contains(Object object) {
+    public void deleteAll(String nameTab) {
         try {
-            raf = new RandomAccessFile(list, "r");
-            String s;
-            while ((s = raf.readLine()) != null) {
-                if (s.equals(object.toString())) {
-                    return true;
-                }
-            }
+            new FileOutputStream(list, false).close();
         } catch (IOException io) {
             io.printStackTrace();
-        } finally {
-            try {
-                raf.close();
-            } catch (IOException i) {
-            }
         }
-        return false;
     }
 
-
-    public void remove(Object object) {
-        File list_temp = new File("list_temp.txt");
+    public void renameTable(String oldName, String newName) {
+        File newTabl = new File(nameDataBase + System.getProperty("file.separator") + newName + ".txt");
         BufferedReader br = null;
         PrintWriter pw = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(list)));
-            pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(list_temp)), true);
+            pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(newTabl)), true);
             String str;
             while ((str = br.readLine()) != null) {
-                if (!str.equals(object.toString())) {
-                    pw.println(str);
-                }
+                pw.println(str);
             }
         } catch (IOException io) {
         } finally {
@@ -110,83 +88,27 @@ public class Writer {
             }
         }
         list.delete();
-        list_temp.renameTo(list);
+        newTabl.renameTo(list);
     }
 
 
-    public int size() {
-        int n = 0;
+    public ArrayList<String> printData() {
+        ArrayList<String> dataInTable = new ArrayList();
         try {
             raf = new RandomAccessFile(list, "r");
             String s;
+            int n = 0;
             while ((s = raf.readLine()) != null) {
-                n++;
-            }
+                dataInTable.add(s);
+             }
         } catch (IOException io) {
-            io.printStackTrace();
         } finally {
             try {
                 raf.close();
             } catch (IOException i) {
             }
         }
-        return n;
-
-    }
-
-    public Object getCounter(int counter) {
-        Object object = null;
-        if (counter < size()) {
-            try {
-                raf = new RandomAccessFile(list, "r");
-                String s;
-                int n = 0;
-                while ((s = raf.readLine()) != null) {
-                    if (n == counter) {
-                        object = s;
-                    }
-                    n++;
-                }
-            } catch (IOException io) {
-            } finally {
-                try {
-                    raf.close();
-                } catch (IOException i) {
-                }
-            }
-            return object;
-        }
-        return "Object on pos. " + counter + " - not found!";
-    }
-
-
-    public Iterator iterator() {
-
-        return new FileIterator();
-
-    }
-
-    class FileIterator implements Iterator {
-        private int counter = count;
-        private Object nextObject = null;
-
-
-        @Override
-        public boolean hasNext() {
-            return (counter < size());
-        }
-
-        @Override
-        public Object next() {
-
-            if (nextObject == null) {
-                nextObject = getCounter(counter);
-            } else if (hasNext()) {
-                nextObject = getCounter(count + 1);
-            }
-            count++;
-            return nextObject;
-        }
+        return dataInTable;
     }
 
 }
