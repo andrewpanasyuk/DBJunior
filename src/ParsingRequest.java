@@ -4,7 +4,7 @@ import java.util.ArrayList;
  * Created by a_pan on 06.05.2016.
  */
 public class ParsingRequest {
-    Writer writer;
+    private Writer writer;
     ParsingRequest(){
         writer = new Writer();
     }

@@ -8,10 +8,8 @@ import java.util.ArrayList;
 public class Writer {
 
     private File list;
-
-
     private String nameDataBase;
-    RandomAccessFile raf = null;
+    private RandomAccessFile raf = null;
 
 
     public void creatTabl(String nameTable) {
