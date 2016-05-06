@@ -48,19 +48,18 @@ public class ParsingRequest {
         return request.substring(request.indexOf("%")+1, request.indexOf("%", request.indexOf("%")+1));
     }
     private void creatDB(String request){
-        System.out.println("I great DB - " + getName(request));
+        writer.creatDBfile(getName(request));
     }
 
     private void creatTable(String request){
-        writer.creatDBfile(getName(request));
+        writer.creatTabl(getName(request));
     }
 
     private void insertInto(String request){
         String nameTab = getName(request);
         int values1 = Integer.parseInt(request.substring((request.indexOf("(")+1), request.indexOf(",")));
         String values2 = request.substring(request.indexOf("'")+1, request.indexOf(("'"),request.indexOf("'")+1) );
-        System.out.println("Values 1 - " + values1);
-        System.out.println("Values 2 - " + values2);
+        writer.add(values1 + "#" + values2);
     }
 
     private void deleteAllFrom (String request){

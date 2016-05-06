@@ -6,179 +6,187 @@ import java.util.Iterator;
  */
 public class Writer {
 
-        private File list;
-        private File dataBaseName;
-        private int count = 0;
-    private
-        RandomAccessFile raf = null;
+    private File list;
+    private File dataBaseName;
+    private int count = 0;
+    private String nameDataBase;
+    RandomAccessFile raf = null;
 
 
-        public void creatTabl(String dataBase, String nameTable) throws Exception {
+    public void creatTabl(String nameTable){
+        try {
+           list = new File(nameDataBase + System.getProperty("file.separator") + nameTable + ".txt");
 
-            list = new File(dataBase + System.getProperty("file.separator")+ nameTable + ".txt");
-            if (!list.exists()) {
+            if (list.exists()) {
+                list.delete();
                 list.createNewFile();
             }
-
-        }
-    public void creatDBfile(String nameDB)  {
-        //dataBaseName = nameDB;
-        try {
-
-            new File(nameDB).mkdirs();
-        }catch (Exception ex){
+        } catch (Exception ex){
             ex.printStackTrace();
         }
 
+
+
+    }
+
+    public void creatDBfile(String nameDB) {
+        nameDataBase = nameDB;
+        try {
+
+            new File(nameDB).mkdirs();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+
+    public void add(Object object) {
+        //list = new File("text.txt");
+        try {
+            raf = new RandomAccessFile(list, "rw");
+            String s;
+            while ((s = raf.readLine()) != null) {
+                raf.seek(raf.getFilePointer());
+            }
+            raf.writeBytes(object.toString() + "\n");
+        } catch (IOException io) {
+            io.printStackTrace();
+        } finally {
+            try {
+                raf.close();
+            } catch (IOException i) {
+            }
         }
 
 
-        public void add(Object object) {
-            list = new File("text.txt");
-            try {
-                raf = new RandomAccessFile(list, "rw");
-                String s;
-                while ((s = raf.readLine()) != null) {
-                    raf.seek(raf.getFilePointer());
-                }
-                raf.writeBytes(object.toString() + "\n");
-            } catch (IOException io) {
-                io.printStackTrace();
-            } finally {
-                try {
-                    raf.close();
-                } catch (IOException i) {
+    }
+
+
+    public boolean contains(Object object) {
+        try {
+            raf = new RandomAccessFile(list, "r");
+            String s;
+            while ((s = raf.readLine()) != null) {
+                if (s.equals(object.toString())) {
+                    return true;
                 }
             }
-
-
+        } catch (IOException io) {
+            io.printStackTrace();
+        } finally {
+            try {
+                raf.close();
+            } catch (IOException i) {
+            }
         }
+        return false;
+    }
 
 
-        public boolean contains(Object object) {
+    public void remove(Object object) {
+        File list_temp = new File("list_temp.txt");
+        BufferedReader br = null;
+        PrintWriter pw = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(list)));
+            pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(list_temp)), true);
+            String str;
+            while ((str = br.readLine()) != null) {
+                if (!str.equals(object.toString())) {
+                    pw.println(str);
+                }
+            }
+        } catch (IOException io) {
+        } finally {
+            try {
+                if (pw != null) {
+                    pw.close();
+                }
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException io) {
+            }
+        }
+        list.delete();
+        list_temp.renameTo(list);
+    }
+
+
+    public int size() {
+        int n = 0;
+        try {
+            raf = new RandomAccessFile(list, "r");
+            String s;
+            while ((s = raf.readLine()) != null) {
+                n++;
+            }
+        } catch (IOException io) {
+            io.printStackTrace();
+        } finally {
+            try {
+                raf.close();
+            } catch (IOException i) {
+            }
+        }
+        return n;
+
+    }
+
+    public Object getCounter(int counter) {
+        Object object = null;
+        if (counter < size()) {
             try {
                 raf = new RandomAccessFile(list, "r");
                 String s;
+                int n = 0;
                 while ((s = raf.readLine()) != null) {
-                    if (s.equals(object.toString())) {
-                        return true;
+                    if (n == counter) {
+                        object = s;
                     }
-                }
-            } catch (IOException io) {
-                io.printStackTrace();
-            } finally {
-                try {
-                    raf.close();
-                } catch (IOException i) {
-                }
-            }
-            return false;
-        }
-
-
-        public void remove(Object object) {
-            File list_temp = new File("list_temp.txt");
-            BufferedReader br = null;
-            PrintWriter pw = null;
-            try {
-                br = new BufferedReader(new InputStreamReader(new FileInputStream(list)));
-                pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(list_temp)), true);
-                String str;
-                while ((str = br.readLine()) != null) {
-                    if (!str.equals(object.toString())) {
-                        pw.println(str);
-                    }
-                }
-            } catch (IOException io) {
-            } finally {
-                try {
-                    if (pw != null) {
-                        pw.close();
-                    }
-                    if (br != null) {
-                        br.close();
-                    }
-                } catch (IOException io) {
-                }
-            }
-            list.delete();
-            list_temp.renameTo(list);
-        }
-
-
-        public int size() {
-            int n = 0;
-            try {
-                raf = new RandomAccessFile(list, "r");
-                String s;
-                while ((s = raf.readLine()) != null) {
                     n++;
                 }
             } catch (IOException io) {
-                io.printStackTrace();
             } finally {
                 try {
                     raf.close();
                 } catch (IOException i) {
                 }
             }
-            return n;
+            return object;
+        }
+        return "Object on pos. " + counter + " - not found!";
+    }
 
+
+    public Iterator iterator() {
+
+        return new FileIterator();
+
+    }
+
+    class FileIterator implements Iterator {
+        private int counter = count;
+        private Object nextObject = null;
+
+
+        @Override
+        public boolean hasNext() {
+            return (counter < size());
         }
 
-        public Object getCounter(int counter) {
-            Object object = null;
-            if (counter < size()) {
-                try {
-                    raf = new RandomAccessFile(list, "r");
-                    String s;
-                    int n = 0;
-                    while ((s = raf.readLine()) != null) {
-                        if (n == counter) {
-                            object = s;
-                        }
-                        n++;
-                    }
-                } catch (IOException io) {
-                } finally {
-                    try {
-                        raf.close();
-                    } catch (IOException i) {
-                    }
-                }
-                return object;
+        @Override
+        public Object next() {
+
+            if (nextObject == null) {
+                nextObject = getCounter(counter);
+            } else if (hasNext()) {
+                nextObject = getCounter(count + 1);
             }
-            return "Object on pos. " + counter + " - not found!";
+            count++;
+            return nextObject;
         }
-
-
-        public Iterator iterator() {
-
-            return new FileIterator();
-
-        }
-
-        class FileIterator implements Iterator {
-            private int counter = count;
-            private Object nextObject = null;
-
-
-            @Override
-            public boolean hasNext() {
-                return (counter < size());
-            }
-
-            @Override
-            public Object next() {
-
-                if (nextObject == null) {
-                    nextObject = getCounter(counter);
-                } else if (hasNext()) {
-                    nextObject = getCounter(count + 1);
-                }
-                count++;
-                return nextObject;
-            }
-        }
+    }
 
 }

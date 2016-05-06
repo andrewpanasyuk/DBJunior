@@ -7,7 +7,9 @@ public class StartDB {
     public static void main(String[] args) {
         ParsingRequest pr = new ParsingRequest();
         pr.selectCommand("CREATE DATABASE %DATABASE_NAME%");
-        //pr.selectCommand("RENAME TABLE %TABLE_NAME% INTO %ANOTHER_TABLE%");
+        pr.selectCommand("CREATE TABLE %FileNAME% (  INT NUMBER, STRING NAME )");
+        pr.selectCommand("INSERT INTO %FileNAME% VALUES (1, 'CHECK') ");
+
 
 
 
